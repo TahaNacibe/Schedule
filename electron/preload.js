@@ -6,4 +6,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
         console.log('[PRELOAD] Sending action:', action);
         ipcRenderer.send('window-control', action);
     },
+
+    installExtension: (url) => ipcRenderer.invoke('install-extension', url),
+    readExtensions: () => ipcRenderer.invoke("get-extensions"),
 });

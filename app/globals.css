@@ -91,7 +91,7 @@
   --secondary-foreground: oklch(0.985 0.002 247.839);
   --muted: oklch(0.278 0.033 256.848);
   --muted-foreground: oklch(0.707 0.022 261.325);
-  --accent: oklch(0.278 0.033 256.848);
+  --accent: oklch(37.126% 0.0037 264.601);
   --accent-foreground: oklch(0.985 0.002 247.839);
   --destructive: oklch(0.704 0.191 22.216);
   --border: oklch(1 0 0 / 10%);
@@ -120,8 +120,6 @@
     @apply bg-background text-foreground;
   }
 }
-
-
 
 /* ------- Control Title bar -------- */
 nav {
@@ -169,7 +167,6 @@ nav {
 .controller-button{
   cursor: pointer;
 }
-
 
 /* Scroll bar */
 /* Hide scrollbar buttons (up/down arrows) - WebKit only */

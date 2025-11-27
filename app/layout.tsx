@@ -1,7 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import CustomTitleBar from "./components/controller";
+import CustomTitleBar from "./components/wrappers/controller";
+import SideBar from "./components/wrappers/sidebar";
+import { SidebarProvider } from "@/components/ui/sidebar";
+import { AppAPIProvider } from "@/contexts/AppAPI";
+import { ThemeProvider } from "next-themes";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -28,10 +32,19 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-y-hidden`}
       >
-        <main>
-          <CustomTitleBar />
+        <ThemeProvider defaultTheme="dark">
+        <AppAPIProvider>
+        <SidebarProvider defaultOpen={false}>
+          <div className="flex flex-col w-full relative">
+            <CustomTitleBar />
+          <main>
+          <SideBar />
           {children}
-        </main>
+          </main>
+          </div>
+        </SidebarProvider>
+        </AppAPIProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
