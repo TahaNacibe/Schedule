@@ -1,8 +1,8 @@
 export default function SidebarProfileComponent({isOpen}:{isOpen:boolean}) { 
     return (
-        <div className="relative px-1.75 py-1.5 rounded-full">
+        <div className="relative px-2 pb-2 pt-1.5 rounded-full">
             {/* profile image */}
-            <div className={`rounded-full w-8.5 h-8.5
+            <div className={`rounded-full w-8 h-8
             transition-all duration-300
             flex justify-center items-center border dark:border-white border-black bg-background`}
                 style={{

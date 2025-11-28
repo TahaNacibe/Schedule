@@ -1,7 +1,6 @@
 "use client"
 import { useAppAPI } from '@/contexts/AppAPI';
 import Link from 'next/link';
-import path from 'path';
 import { useState } from 'react';
 
 export default function InstallPage() {
@@ -10,7 +9,7 @@ export default function InstallPage() {
   const {updateExtensions} = useAppAPI();
 
   const handleInstall = async () => {
-    const url = 'https://www.dropbox.com/scl/fi/sjm8uy7mlrf65g3krzflc/request-magic_number-data-2.zip?rlkey=20sw8ks9xvl69u1o7aocs3dtc&st=w1tbwbfb&dl=1';  // Replace with your real URL
+    const url = 'https://www.dropbox.com/scl/fi/wlepq01a2rl6kukvkpc0b/new-ext.zip?rlkey=vugikm46lufuxjao1hkobpqgb&st=4rgrbgfj&dl=1';  // Replace with your real URL
     setStatus('Installing...');
 
     if (window.electronAPI) {

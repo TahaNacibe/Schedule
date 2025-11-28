@@ -19,7 +19,8 @@ export default function SidebarMenuExtensionItemWrapper({
     onClick?: () => void;
     }) {
     
-    const {theme} = useTheme()
+    const { theme } = useTheme()
+    console.log("Rendering SidebarMenuExtensionItemWrapper for ", theme);
     return (
         <SidebarMenuItem
             onClick={(e) => {
@@ -32,7 +33,7 @@ export default function SidebarMenuExtensionItemWrapper({
         {/* This wrapper prevents the Sidebar from breaking */}
         <div
             className={`
-            relative flex items-center h-10 
+            relative flex items-center h-11 
             overflow-hidden 
             transition-all duration-300
             `}
@@ -46,7 +47,7 @@ export default function SidebarMenuExtensionItemWrapper({
             "
             >
             {/* Icon stays fixed size → no shifting */}
-            <Icon src={icon} className="shrink-0 px-3" themeColor={theme as ("dark" | "light" | undefined) ?? "dark"} />
+            <Icon src={icon} className="shrink-0 mx-3" themeColor={theme as ("dark" | "light" | undefined) ?? "light"} />
 
             {/* Text reveals only when open */}
             <span

@@ -10,12 +10,18 @@ type AppContextType = {
   appAPI: AppAPI,
   updateExtensions: (newExtensions: Array<Extensions>) => void,
   readExtensions: () => Array<Extensions>,
+  userSignedIn : boolean,
+  setUserSignedIn : (state: boolean) => void,
+  userId: string | null
+  setUserId: (id:string | null) => void
 }
 
 const AppAPIContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppAPIProvider({ children }: { children: React.ReactNode }) {
   const [extensions, setExtensions] = useState<Array<Extensions>>([]);  // For storing extensions
+  const [userSignedIn, setUserSignedIn] = useState(false)
+  const [userId, setUserId] = useState<string | null>(null)
   const appAPI: AppAPI = {
     insertText: (text: string) => {
       // Your app's task: e.g., insert into an editor
@@ -36,7 +42,11 @@ export function AppAPIProvider({ children }: { children: React.ReactNode }) {
 
 
   return <AppAPIContext.Provider
-    value={{ appAPI, updateExtensions, readExtensions }}>
+    value={{ appAPI, updateExtensions, readExtensions, userSignedIn,
+    setUserSignedIn,
+    userId,
+    setUserId 
+    }}>
     {children}
   </AppAPIContext.Provider>;
 }

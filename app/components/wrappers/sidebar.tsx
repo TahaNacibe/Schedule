@@ -1,14 +1,12 @@
 "use client";
 import {
   Sidebar,
-  SidebarHeader,
   SidebarMenu,
   SidebarMenuItem,
   SidebarContent,
   SidebarFooter,
   useSidebar,
   SidebarSeparator,
-  SidebarGroup,
 } from "@/components/ui/sidebar";
 import { Home, Settings, ShoppingBag } from "lucide-react";
 import SidebarMenuItemWrapper from "../wrappers_sub_components/sidebar_menu_item";
@@ -62,7 +60,7 @@ export default function SideBar() {
       collapsible="icon"
       className="w-[calc(35vh-32px)] left-0 overflow-x-hidden pt-0 flex justify-between 
       bg-background!
-      border-r-2! border-dashed border-gray-300 dark:border-gray-600"
+      border-r-2! border-gray-300 dark:border-gray-600"
     >
       
       <SidebarContent className="overflow-x-hidden bg-background! gap-0">
@@ -92,7 +90,7 @@ export default function SideBar() {
           isOpen={state == "expanded"}
         />
 
-         <SidebarProfileComponent isOpen={state == "expanded"} />
+        <SidebarProfileComponent isOpen={state == "expanded"} />
         <SidebarSeparator className="border dark:border-gray-600 border-gray-200 mx-0! shadow-none" />
 
         {/* ------------ Extensions ---------- */}
