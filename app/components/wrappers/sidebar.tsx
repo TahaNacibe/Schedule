@@ -15,6 +15,7 @@ import SidebarProfileComponent from "../wrappers_sub_components/sidebar_profile_
 import { useAppAPI } from "@/contexts/AppAPI";
 import { useEffect, useState } from "react";
 import SidebarMenuExtensionItemWrapper from "../wrappers_sub_components/sidebar_extenstion";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function SideBar() {
   // Sidebar state
@@ -23,6 +24,7 @@ export default function SideBar() {
   const [error, setError] = useState<string | null>(null);
   const { state } = useSidebar();
   const { readExtensions, updateExtensions } = useAppAPI();
+  const {user} = useAuth()
   
   // Load extensions on mount (if needed)
   const handleRead = async () => {
@@ -90,7 +92,7 @@ export default function SideBar() {
           isOpen={state == "expanded"}
         />
 
-        <SidebarProfileComponent isOpen={state == "expanded"} />
+        <SidebarProfileComponent src={user?.photoURL} />
         <SidebarSeparator className="border dark:border-gray-600 border-gray-200 mx-0! shadow-none" />
 
         {/* ------------ Extensions ---------- */}

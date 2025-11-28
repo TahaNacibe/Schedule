@@ -1,6 +1,6 @@
 "use client"
 import { read } from 'fs';
-import React, { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 
 type AppAPI = {
   insertText: (text: string) => void;
@@ -22,14 +22,12 @@ export function AppAPIProvider({ children }: { children: React.ReactNode }) {
   const [extensions, setExtensions] = useState<Array<Extensions>>([]);  // For storing extensions
   const [userSignedIn, setUserSignedIn] = useState(false)
   const [userId, setUserId] = useState<string | null>(null)
+
   const appAPI: AppAPI = {
     insertText: (text: string) => {
-      // Your app's task: e.g., insert into an editor
       console.log(`Inserting: ${text}`);  // Placeholder
-      // Real: document.getElementById('editor').innerHTML += text; or use Quill/Monaco
       alert(`Task done: Inserted "${text}"`);  // Visual feedback
     },
-    // Add more: getUserData, saveFile, etc.
   };
 
   const updateExtensions = (newExtensions: Array<Extensions>) => { 
