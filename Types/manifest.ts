@@ -6,5 +6,11 @@ interface Manifest {
         icon: string;
         author: string;
         license: string;
-        path: string;
-    }
+        allowList: ExtAllowList[]
+}
+    
+
+interface ExtAllowList {
+    id: string,
+    permission: "READ" | "WRITE" | "READ-WRITE"
+}

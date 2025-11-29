@@ -1,5 +1,11 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
 const path = require('path');
+require('dotenv').config({ 
+  path: path.join(__dirname, '..', '.env.local'),
+  debug: true  
+});
+
+const { app, BrowserWindow, ipcMain, dialog } = require('electron');
+const cloudinary = require('cloudinary').v2;
 const isDev = require('electron-is-dev');
 const AdmZip = require('adm-zip');
 const { pipeline } = require('stream');
@@ -141,3 +147,20 @@ ipcMain.handle('get-extensions', async () => {
     return [];
   }
 })
+
+
+
+// image upload
+ipcMain.handle('select-file', async () => {
+  const result = await dialog.showOpenDialog({
+    properties: ['openFile'],
+    filters: [{ name: 'Images', extensions: ['jpg', 'png', 'gif'] }],
+  });
+  return result.canceled ? null : result.filePaths[0];
+});
+
+
+ipcMain.handle('upload-file', async (event, filePath,ext_id) => {
+  const result = await cloudinary.uploader.upload(filePath, { folder: `/schedule/${ext_id}/uploads` });
+  return result.secure_url; 
+});

@@ -1,124 +1,70 @@
 "use client";
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import {
   clearUserDataFromDB,
   deleteDataFromDB,
   readDataFromDB,
-  updateDataToDB,
   writeDataToDB,
 } from "@/middleware/firebase_middleware";
 import Auth from "./components/auth/auth";
 import { useAppAPI } from "@/contexts/AppAPI";
 import { useAuth } from "@/hooks/useAuth";
 import { updateCurrentUser, updateProfile } from "firebase/auth";
+import { useState } from "react";
+import cloudinaryMiddleware from "@/middleware/cloudinary_middleware";
+import { auth } from "@/lib/firebase";
+import { createDocInAnotherExtensionCollection, deleteDataFromAnotherExt, readDataFromAnotherExt, updateDataInAnotherExtData } from "@/middleware/inter_extension_middleware";
 
-/* eslint-disable react/no-unescaped-entities */
+
+
 export default function Home() {
   const { user } = useAuth();
-  const handleCreate = async ({
-    ext_id,
-    collection_name,
-    user_id,
-    payload,
-  }: {
-    ext_id: string;
-    collection_name: string;
-    user_id: string;
-    payload: any;
-  }) => {
-    const res = await writeDataToDB({
-      ext_id,
-      collection_name,
-      user_id,
-      payload,
-    });
-    console.log(res);
+  const [selectedFile, setSelectedFile] = useState<string | null>(null)
+
+  const handleSelectFile = async () => {
+    const path = await window.electronAPI!.selectFile(); // IPC call
+    if (path) {
+      setSelectedFile(path);
+      console.log("path is : " + path)
+      const res = await cloudinaryMiddleware({
+        file_path: path,
+        ext_id: "MAIN-APP"
+      })
+
+      if (res.success) {
+  const photoURL = res.data;
+  if (!photoURL) return; // Guard
+
+  // Update Firebase profile (uses auth.currentUser internally)
+  await updateProfile(auth.currentUser!, { photoURL });
+
+  // If updateCurrentUser is for app state (e.g., Redux/Zustand), pass the Firebase user or updated state
+  updateCurrentUser(auth, auth.currentUser!)
+}
+    }
   };
 
-  const handleRead = async ({
-    ext_id,
-    collection_name,
-    user_id,
-    target_id,
-  }: {
-    ext_id: string;
-    collection_name: string;
-    user_id: string;
-    target_id: string | null;
-  }) => {
-    const res = await readDataFromDB({
-      collection_name,
-      ext_id,
-      user_id,
-      fetch_count: null,
-      target_id: target_id,
-      order_by: "asc",
-    });
-    console.log(res);
-  };
-
-  const handleDelete = async ({
-    ext_id,
-    collection_name,
-    user_id,
-    target_id,
-  }: {
-    ext_id: string;
-    collection_name: string;
-    user_id: string;
-    target_id: string;
-  }) => {
-    const res = await deleteDataFromDB({
-      ext_id,
-      collection_name,
-      user_id,
-      target_id,
-    });
-    console.log(res);
-  };
-
-  const handleClear = async ({
-    ext_id,
-    collection_name,
-    user_id,
-  }: {
-    ext_id: string;
-    collection_name: string;
-    user_id: string;
-  }) => {
-    const res = await clearUserDataFromDB({ ext_id, collection_name, user_id });
-    console.log(res);
-  };
+  const testUnite = async () => {
+    const state = await deleteDataFromAnotherExt({
+      targetExt_id: "test-1",
+      targetExt_allowList: [{id:  "test-unite", permission: "READ-WRITE"}],
+      activeExt_id: "test-unite",
+      user_id: user?.uid ?? "TempUser",
+      collection_name: "journals",
+      targetItem_id: "5qcSHy5cPhilBGqLo6zH",
+    })
+    console.log(state)
+  }
 
   return (
     <div className="w-screen h-screen flex flex-col justify-center items-center">
       <Auth />
       {/* experimental area  */}
-      <div className="flex gap-2 justify-center items-center w-full h-full">
         <button
-          onClick={async () =>
-            await updateProfile(user!, {
-              photoURL:
-                "https://i.pinimg.com/736x/8d/5e/c5/8d5ec5e06b8550c27d219a6ca4e626b9.jpg",
-            })
-          }
-          className="rounded-full border-2 border-dashed px-2 py-1"
-        >
-          create data for extension names test 1
-        </button>
-        <button
-          onClick={async () =>
-            await handleClear({
-              ext_id: "test-2",
-              collection_name: "notes-test-1",
-              user_id: user ? user.uid + "5" : "temp-user",
-            })
-          }
-          className="rounded-full border-2 border-dashed px-2 py-1"
-        >
-          create data for extension names test 2
-        </button>
-      </div>
+        className="border-2 border-dashed border-white mt-8 w-24"
+        onClick={testUnite}
+      >
+        Test unite
+      </ button>
     </div>
   );
 }

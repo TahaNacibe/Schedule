@@ -16,6 +16,7 @@ import { useAppAPI } from "@/contexts/AppAPI";
 import { useEffect, useState } from "react";
 import SidebarMenuExtensionItemWrapper from "../wrappers_sub_components/sidebar_extenstion";
 import { useAuth } from "@/hooks/useAuth";
+import Link from "next/link";
 
 export default function SideBar() {
   // Sidebar state
@@ -92,7 +93,9 @@ export default function SideBar() {
           isOpen={state == "expanded"}
         />
 
-        <SidebarProfileComponent src={user?.photoURL} />
+        <Link href={"/"}>
+          <SidebarProfileComponent src={user?.photoURL} />
+        </Link>
         <SidebarSeparator className="border dark:border-gray-600 border-gray-200 mx-0! shadow-none" />
 
         {/* ------------ Extensions ---------- */}

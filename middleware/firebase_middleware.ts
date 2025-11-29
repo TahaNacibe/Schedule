@@ -1,8 +1,11 @@
+import {
+  MISSING_REQUIRED_ARGUMENT, TASK_COMPLETED_SUCCESSFULLY,
+  ERROR_COMPLETING_TASK, UNKNOWN_ERROR, TARGET_WAS_NOT_FOUND
+} from "@/lib/errors_handlers";
 import { db } from "@/lib/firebase";
 import {
   addDoc,
   collection,
-  CollectionReference,
   deleteDoc,
   doc,
   DocumentReference,
@@ -29,43 +32,15 @@ const extCollectionPathRef = ({
   collection_name: string;
   ext_id: string;
   user_id: string;
-}) => {
+  }) => {
+  console.log("ext path -- user_id : " + user_id)
+    console.log("ext path -- collection_name : " + collection_name)
   const extCollRef = collection(db, ext_id);
-  const userDocRef = doc(extCollRef, user_id);
-  const userCollRef = collection(userDocRef, collection_name);
-  return userCollRef;
+  const spicCollRef = doc(extCollRef, collection_name);
+  const userDocRef = collection(spicCollRef, user_id);
+  console.log(userDocRef)
+  return userDocRef;
 };
-
-//* standardized returns
-const MISSING_REQUIRED_ARGUMENT = {
-  success: false,
-  message: "messing require argument",
-  data: null,
-};
-
-const UNKNOWN_ERROR = {
-  success: false,
-  message: "unknown error happen ",
-  data: null,
-};
-
-const TARGET_WASNT_FOUND = {
-  success: false,
-  message: "the target id doesn't exist within this collection",
-  data: null,
-};
-
-const ERROR_COMPLETING_TASK = (error: Error) => ({
-  success: false,
-  message: "Failed to complete the task [ERROR]: " + error.name,
-  data: error.message,
-});
-
-const TASK_COMPLETED_SUCCESSFULLY = <T = unknown>(data: T) => ({
-  success: true,
-  message: "Task Completed",
-  data: data,
-});
 
 /** 
 * the function will handle sub collection delete operation for a single subclass at a time
@@ -79,12 +54,16 @@ const TASK_COMPLETED_SUCCESSFULLY = <T = unknown>(data: T) => ({
 - @param {unknown} data => the response data in case of no data it return null
 **/
 
+
+//* Interface
 interface deleteSubcollectionInterface {
   parentRef: DocumentReference;
   subcollectionName: string;
   batchSize?: number;
 }
 
+
+//* Delete a sub collection from a parent for extensions
 const deleteSubcollection = async ({
   parentRef,
   subcollectionName,
@@ -95,12 +74,9 @@ const deleteSubcollection = async ({
       return MISSING_REQUIRED_ARGUMENT;
     }
     const subCollRef = collection(parentRef, subcollectionName);
-    console.log(subCollRef)
     const snapshot = await getDocs(subCollRef);
-    console.log(snapshot.docs)
 
     if (snapshot.empty) {
-      console.log("yeb you fucked us")
       return TASK_COMPLETED_SUCCESSFULLY(null);
     }
 
@@ -110,24 +86,18 @@ const deleteSubcollection = async ({
     let operationCount = 0;
 
     for (const docSnap of snapshot.docs) {
-      // Delete the doc
       currentBatch.delete(docSnap.ref);
       operationCount++;
-
-      // If batch full, push and start new
       if (operationCount >= batchSize) {
         batches.push(currentBatch);
         currentBatch = writeBatch(db);
         operationCount = 0;
       }
     }
-
-    // Final batch if any ops left
     if (operationCount > 0) {
       batches.push(currentBatch);
     }
 
-    // Commit all batches sequentially (parallel risky for quotas)
     for (const batch of batches) {
       await batch.commit();
     }
@@ -140,6 +110,8 @@ const deleteSubcollection = async ({
     return UNKNOWN_ERROR;
   }
 };
+
+
 
 /** 
 * Write to db all post request to db from app and extensions pass through this middleware
@@ -154,6 +126,7 @@ const deleteSubcollection = async ({
 - @param {unknown} data => the response data in case of no data it return null
 **/
 
+
 //* Interface
 interface writeDataToDBInterface<T = unknown> {
   ext_id: string;
@@ -162,13 +135,15 @@ interface writeDataToDBInterface<T = unknown> {
   payload: T;
 }
 
-//* Write to extension specific storage
+//? --- POST ----
 async function writeDataToDB({
   ext_id,
   collection_name,
   user_id,
   payload,
 }: writeDataToDBInterface): Promise<CustomResponse> {
+  console.log("firebase -- user_id : " + user_id)
+  console.log("firebase -- collection_name : " + collection_name)
   //? Null check
   if (!collection_name || !payload || !user_id || !ext_id) {
     return MISSING_REQUIRED_ARGUMENT;
@@ -226,7 +201,7 @@ interface readDataFromDBInterface {
   order_by: "desc" | "asc";
 }
 
-//* Fetch data for extension
+//? --- GET ---
 async function readDataFromDB({
   collection_name,
   ext_id,
@@ -263,7 +238,7 @@ async function readDataFromDB({
       const docRef = doc(collectionRef, target_id);
       snapshot = await getDoc(docRef);
       if (!snapshot.exists()) {
-        return TARGET_WASNT_FOUND;
+        return TARGET_WAS_NOT_FOUND;
       }
 
       // let it be don't try to act smart
@@ -317,8 +292,8 @@ interface updateDataToDBInterface<T = unknown> {
   payload: T;
 }
 
-//* Update doc content for user
-async function updateDataToDB({
+//? --- PUT ----
+async function updateDataInDB({
   collection_name,
   user_id,
   ext_id,
@@ -340,7 +315,7 @@ async function updateDataToDB({
     const snapshot = await getDoc(targetRef);
 
     if (!snapshot.exists()) {
-      return TARGET_WASNT_FOUND;
+      return TARGET_WAS_NOT_FOUND;
     }
 
     await updateDoc(targetRef, {
@@ -378,7 +353,7 @@ interface deleteDataFromDBInterface {
   target_id: string;
 }
 
-//* Delete doc from user specified collection
+//? --- DELETE ----
 async function deleteDataFromDB({
   collection_name,
   ext_id,
@@ -400,7 +375,7 @@ async function deleteDataFromDB({
     const snapshot = await getDoc(targetRef);
 
     if (!snapshot.exists()) {
-      return TARGET_WASNT_FOUND;
+      return TARGET_WAS_NOT_FOUND;
     }
 
     await deleteDoc(targetRef);
@@ -434,7 +409,7 @@ interface clearUserDataFromDBInterface {
   user_id: string;
 }
 
-//* Delete doc from user specified collection
+//? ---- DELETE ----
 async function clearUserDataFromDB({
   collection_name,
   ext_id,
@@ -467,7 +442,7 @@ async function clearUserDataFromDB({
 export {
   writeDataToDB,
   readDataFromDB,
-  updateDataToDB,
+  updateDataInDB,
   deleteDataFromDB,
   clearUserDataFromDB,
 };

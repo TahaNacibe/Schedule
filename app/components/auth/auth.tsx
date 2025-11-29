@@ -1,11 +1,9 @@
-/* eslint-disable react/no-unescaped-entities */
 "use client";
 import { useState } from "react";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   signOut,
-  updateCurrentUser,
   updateProfile,
 } from "firebase/auth";
 import { auth } from "@/lib/firebase";
@@ -21,7 +19,6 @@ export default function Auth() {
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSignInError(null);
     try {
       await signInWithEmailAndPassword(auth, email, password);
       setUserSignedIn(true);
