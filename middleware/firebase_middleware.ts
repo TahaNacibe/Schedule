@@ -23,7 +23,6 @@ import {
  * @param extCollectionPathRef => get the path to the collection of the user at the extension storage
  * @returns {CollectionReference<DocumentData, DocumentData>}
  * **/
-
 const extCollectionPathRef = ({
   collection_name,
   ext_id,
@@ -42,6 +41,9 @@ const extCollectionPathRef = ({
   return userDocRef;
 };
 
+
+
+
 /** 
 * the function will handle sub collection delete operation for a single subclass at a time
 - @param {CollectionReference} parentRef => the collection needed to be cleared
@@ -53,16 +55,11 @@ const extCollectionPathRef = ({
 - @param {string} message => contain a small message about the situation
 - @param {unknown} data => the response data in case of no data it return null
 **/
-
-
-//* Interface
 interface deleteSubcollectionInterface {
   parentRef: DocumentReference;
   subcollectionName: string;
   batchSize?: number;
 }
-
-
 //* Delete a sub collection from a parent for extensions
 const deleteSubcollection = async ({
   parentRef,
@@ -125,16 +122,12 @@ const deleteSubcollection = async ({
 - @param {string} message => contain a small message about the situation
 - @param {unknown} data => the response data in case of no data it return null
 **/
-
-
-//* Interface
 interface writeDataToDBInterface<T = unknown> {
   ext_id: string;
   collection_name: string;
   user_id: string;
   payload: T;
 }
-
 //? --- POST ----
 async function writeDataToDB({
   ext_id,
@@ -176,6 +169,8 @@ async function writeDataToDB({
   }
 }
 
+
+
 /** 
 * read data for a specific user from a specific collection based on id
 - @param {string} ext_id => is the id specified to the extension making the request parent app will use 'MAIN-APP' as id
@@ -190,8 +185,6 @@ async function writeDataToDB({
 - @param {string} message => contain a small message about the situation
 - @param {unknown} data => the response data in case of no data it return null
 **/
-
-//* interface
 interface readDataFromDBInterface {
   collection_name: string;
   ext_id: string;
@@ -200,7 +193,6 @@ interface readDataFromDBInterface {
   target_id: string | null;
   order_by: "desc" | "asc";
 }
-
 //? --- GET ---
 async function readDataFromDB({
   collection_name,
@@ -282,8 +274,6 @@ async function readDataFromDB({
 - @param {string} message => contain a small message about the situation
 - @param {unknown} data => the response data in case of no data it return null
 **/
-
-//* Interface
 interface updateDataToDBInterface<T = unknown> {
   collection_name: string;
   user_id: string;
@@ -291,7 +281,6 @@ interface updateDataToDBInterface<T = unknown> {
   target_id: string;
   payload: T;
 }
-
 //? --- PUT ----
 async function updateDataInDB({
   collection_name,
@@ -332,6 +321,9 @@ async function updateDataInDB({
   }
 }
 
+
+
+
 /** 
 * delete a specific doc from a specific user based on id
 - @param {string} collection_name => is the collection the extension own and contain the current file
@@ -344,15 +336,12 @@ async function updateDataInDB({
 - @param {string} message => contain a small message about the situation
 - @param {unknown} data => the response data in case of no data it return null
 **/
-
-//* Interface
 interface deleteDataFromDBInterface {
   collection_name: string;
   ext_id: string;
   user_id: string;
   target_id: string;
 }
-
 //? --- DELETE ----
 async function deleteDataFromDB({
   collection_name,
@@ -401,14 +390,11 @@ async function deleteDataFromDB({
 - @param {string} message => contain a small message about the situation
 - @param {unknown} data => the response data in case of no data it return null
 **/
-
-//* Interface
 interface clearUserDataFromDBInterface {
   collection_name: string;
   ext_id: string;
   user_id: string;
 }
-
 //? ---- DELETE ----
 async function clearUserDataFromDB({
   collection_name,

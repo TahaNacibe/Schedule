@@ -19,8 +19,6 @@ function unsupportedAction (url: string, config?: AxiosRequestConfig): Promise<a
  * @param data - Request body (for POST/PUT/DELETE) or query params (for GET).
  * @returns Axios response or error code.
  */
-
-
 export async function makeApiRequest(
     endpoint: string,
     request_type: Uppercase<Method>,
