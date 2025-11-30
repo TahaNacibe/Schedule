@@ -19,7 +19,6 @@ const Icon: React.FC<IconProps> = ({ src, className = "", themeColor }) => {
     // Check cache first
     if (svgCache.has(src)) {
       const cached = svgCache.get(src)!;
-      console.log(`Using cached SVG for ${src}`); // Optional log
       setSvgContent(cached);
       return;
     }
@@ -28,8 +27,6 @@ const Icon: React.FC<IconProps> = ({ src, className = "", themeColor }) => {
     fetch(src)
       .then((res) => res.text())
       .then((svg) => {
-        console.log(`Fetched and cached SVG for ${src}`);
-
         // Comprehensive replacement for black variants to currentColor
         // Matches: #000000, #000, black, rgb(0,0,0) and whitespace variants
         const blackRegex =

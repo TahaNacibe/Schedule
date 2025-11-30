@@ -15,7 +15,7 @@ export default function CustomTitleBar() {
   } = useSidebar()
 
   return (
-    <div className=" z-10 w-full flex justify-end " style={{ WebkitAppRegion: 'drag' } as any} >
+    <div className=" z-10 w-full flex justify-end absolute" style={{ WebkitAppRegion: 'drag' } as any} >
       <div className="flex justify-end pl-12 w-full">
         <div className="flex" style={{ WebkitAppRegion: 'no-drag' } as any}>
         {/* Controller buttons */}
