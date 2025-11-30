@@ -98,11 +98,10 @@ export default function SideBar() {
               <SidebarMenuExtensionItemWrapper
                 key={ext.id + index}
                 activeId={activeExtensionId!}
-                onClick={() => {
+                onLinkPress={() => {
                   setActiveExtensionId(ext.id);
                 }}
                 icon={`/extensions/${ext.id}/icon.svg`}
-                title={ext.manifest.name}
                 link={`/extensions/${ext.id}`}
               />
             ))}
