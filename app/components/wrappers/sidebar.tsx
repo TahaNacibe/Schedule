@@ -53,6 +53,7 @@ export default function SideBar() {
           if (index == 0) {
             return (
               <Link
+              key={index}
                 onClick={(e) => {
                   setActiveExtensionId("/")
                 }}

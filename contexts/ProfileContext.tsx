@@ -1,26 +1,31 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client"
+import { useAuth } from '@/hooks/useAuth';
+import { fetchUsersProfiles } from '@/services/firebase_services';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
 
 
 type ProfileContextType = {
-    updateAuthState:(state:boolean) => void ,
-    getUserAuthState:() => boolean ,
-    updateCurrentUser:(user:Profile) => void ,
-    getCurrentUserProfile:() => Profile | null,
-    updateFriendsList:(friendsList: Profile[]) => void ,
-    getFriendsList:() => Profile[] ,
-    updateRequestsList:(requestsList: Profile[]) => void ,
-    getRequestsList:() => Profile[] ,
-}
+  updateAuthState: (state: boolean) => void;
+  getUserAuthState: () => boolean;
+  updateCurrentUser: (user: Profile) => void;
+  getCurrentUserProfile: () => Profile | null;
+  updateFriendsList: (friendsList: Profile[]) => void;
+  getFriendsList: () => Profile[];
+  updateRequestsList: (requestsList: Profile[]) => void;
+  getRequestsList: () => Profile[];
+  fetchUserProfile: () => void
+};
 
 const ProfileContext = createContext<ProfileContextType | undefined>(undefined);
 
 export function ProfileApiProvider({ children }: { children: React.ReactNode }) {
     const [userSignedIn, setUserSignedIn] = useState(false)
-    const [user, setUser] = useState<Profile | null>(null)
+    const [userProfile, setUserProfile] = useState<Profile | null>(null)
     const [friends, setFriendsList] = useState<Profile[]>([])
     const [requests, setRequestsLists] = useState<Profile[]>([])
+    const {user} = useAuth()
     // auth
     function updateAuthState(state: boolean) {
         setUserSignedIn(state)
@@ -29,13 +34,25 @@ export function ProfileApiProvider({ children }: { children: React.ReactNode }) 
         return userSignedIn
     }
 
+    async function fetchUserProfile(){
+        console.log("fuck")
+        if(user){
+            console.log("started")
+            const res = await fetchUsersProfiles({user_ids:[user.uid], currentUser_id: user.uid})
+            if(res.success && res.data!.length > 0){
+                console.log("created profile")
+                setUserProfile(res.data![0] as Profile)
+            }
+        }
+    }
+
 
     // user profile
     function updateCurrentUser(user: Profile) {
-        setUser(user)
+        setUserProfile(user)
     }
     function getCurrentUserProfile() {
-        return user
+        return userProfile
     }
 
     // 
@@ -62,19 +79,23 @@ export function ProfileApiProvider({ children }: { children: React.ReactNode }) 
 
 
 
-    return <ProfileContext.Provider
-    value={{ 
-        updateAuthState,
-        getUserAuthState,
-        updateCurrentUser,
-        getCurrentUserProfile,
-        updateFriendsList,
-        getFriendsList,
-        updateRequestsList,
-        getRequestsList,
-    }}>
-    {children}
-    </ProfileContext.Provider>;
+    return (
+      <ProfileContext.Provider
+        value={{
+          updateAuthState,
+          getUserAuthState,
+          updateCurrentUser,
+          getCurrentUserProfile,
+          updateFriendsList,
+          getFriendsList,
+          updateRequestsList,
+          getRequestsList,
+          fetchUserProfile,
+        }}
+      >
+        {children}
+      </ProfileContext.Provider>
+    );
 }
 
 export const useProfile = () => {
