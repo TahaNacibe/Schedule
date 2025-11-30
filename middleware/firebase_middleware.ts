@@ -1,6 +1,9 @@
 import {
-  MISSING_REQUIRED_ARGUMENT, TASK_COMPLETED_SUCCESSFULLY,
-  ERROR_COMPLETING_TASK, UNKNOWN_ERROR, TARGET_WAS_NOT_FOUND
+  MISSING_REQUIRED_ARGUMENT,
+  TASK_COMPLETED_SUCCESSFULLY,
+  ERROR_COMPLETING_TASK,
+  UNKNOWN_ERROR,
+  TARGET_WAS_NOT_FOUND,
 } from "@/lib/errors_handlers";
 import { db } from "@/lib/firebase";
 import {
@@ -31,18 +34,15 @@ const extCollectionPathRef = ({
   collection_name: string;
   ext_id: string;
   user_id: string;
-  }) => {
-  console.log("ext path -- user_id : " + user_id)
-    console.log("ext path -- collection_name : " + collection_name)
+}) => {
+  console.log("ext path -- user_id : " + user_id);
+  console.log("ext path -- collection_name : " + collection_name);
   const extCollRef = collection(db, ext_id);
   const spicCollRef = doc(extCollRef, collection_name);
   const userDocRef = collection(spicCollRef, user_id);
-  console.log(userDocRef)
+  console.log(userDocRef);
   return userDocRef;
 };
-
-
-
 
 /** 
 * the function will handle sub collection delete operation for a single subclass at a time
@@ -108,8 +108,6 @@ const deleteSubcollection = async ({
   }
 };
 
-
-
 /** 
 * Write to db all post request to db from app and extensions pass through this middleware
 - @param {string} ext_id => is the id specified to the extension making the request parent app will use 'MAIN-APP' as id
@@ -135,8 +133,8 @@ async function writeDataToDB({
   user_id,
   payload,
 }: writeDataToDBInterface): Promise<CustomResponse> {
-  console.log("firebase -- user_id : " + user_id)
-  console.log("firebase -- collection_name : " + collection_name)
+  console.log("firebase -- user_id : " + user_id);
+  console.log("firebase -- collection_name : " + collection_name);
   //? Null check
   if (!collection_name || !payload || !user_id || !ext_id) {
     return MISSING_REQUIRED_ARGUMENT;
@@ -152,8 +150,8 @@ async function writeDataToDB({
     //? create document
     const res = await addDoc(collectionRef, {
       ...payload,
-      "createdAt": Timestamp.now(),
-      "updatedAt  ": Timestamp.now()
+      createdAt: Timestamp.now(),
+      "updatedAt  ": Timestamp.now(),
     });
 
     //? update with id for later purposes (fetch)
@@ -168,8 +166,6 @@ async function writeDataToDB({
     return UNKNOWN_ERROR;
   }
 }
-
-
 
 /** 
 * read data for a specific user from a specific collection based on id
@@ -247,7 +243,7 @@ async function readDataFromDB({
       data = snapshot.docs.map((doc) => {
         return {
           ...doc.data(),
-          "id": doc.id,
+          id: doc.id,
         };
       });
     }
@@ -309,7 +305,7 @@ async function updateDataInDB({
 
     await updateDoc(targetRef, {
       ...payload,
-      "updatedAt": Timestamp.now(),
+      updatedAt: Timestamp.now(),
     });
 
     return TASK_COMPLETED_SUCCESSFULLY(null);
@@ -320,9 +316,6 @@ async function updateDataInDB({
     return UNKNOWN_ERROR;
   }
 }
-
-
-
 
 /** 
 * delete a specific doc from a specific user based on id
