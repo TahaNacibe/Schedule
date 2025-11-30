@@ -4,8 +4,9 @@ interface Profile {
     photo_URL: string | undefined,
     cover_URL: string | undefined,
     bio: string,
-    friends: Friend[]
+    state: "PENDING" | "ACCEPTED" | null
     searchKeyWords: string[]
+    
 }
 
 interface Friend {

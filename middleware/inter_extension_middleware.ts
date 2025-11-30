@@ -63,8 +63,6 @@ async function createDocInAnotherExtensionCollection({
 }
 
 
-
-
 /**
  * Updates an existing document inside another extension's collection.
  * Requires WRITE permission. Forwards the update to updateDataInDB().

@@ -31,6 +31,14 @@ const TARGET_WAS_NOT_FOUND = {
 
 
 //* the target from the request either doesn't exist or returned a 404 error
+const TARGET_ALREADY_EXIST = {
+    success: false,
+    message: "Target already exist for this id - [400]",
+    data: null,
+};
+
+
+//* the target from the request either doesn't exist or returned a 404 error
 const ACCESS_REJECTED = {
     success: false,
     message: "Not enough permissions - [403]",
@@ -60,6 +68,7 @@ export {
     ACCESS_REJECTED,
     TARGET_WAS_NOT_FOUND,
     INCORRECT_ARGUMENTS_PASSED,
+    TARGET_ALREADY_EXIST,
     ERROR_COMPLETING_TASK,
     TASK_COMPLETED_SUCCESSFULLY
 }
