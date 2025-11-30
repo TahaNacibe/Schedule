@@ -97,6 +97,7 @@ export default function SideBar() {
             {readExtensions().map((ext, index) => (
               <SidebarMenuExtensionItemWrapper
                 key={ext.id + index}
+                title={ext.manifest.name}
                 activeId={activeExtensionId!}
                 onLinkPress={() => {
                   setActiveExtensionId(ext.id);
