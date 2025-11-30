@@ -4,8 +4,8 @@ interface Profile {
     photo_URL: string | undefined,
     cover_URL: string | undefined,
     bio: string,
-    state: "PENDING" | "ACCEPTED" | null
-    searchKeyWords: string[]
+    state?: "PENDING" | "ACCEPTED" | null
+    searchKeyWords?: string[]
     
 }
 

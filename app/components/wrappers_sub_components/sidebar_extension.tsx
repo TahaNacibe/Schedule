@@ -7,20 +7,17 @@ export default function SidebarMenuExtensionItemWrapper({
     icon,
     title,
     link,
-    isOpen,
     activeId,
     onClick,
 }: {
     icon: string;
     title: string;
     link: string;
-    isOpen: boolean;
     activeId: string;
     onClick?: () => void;
     }) {
     
     const { theme } = useTheme()
-    console.log("Rendering SidebarMenuExtensionItemWrapper for ", theme);
     return (
         <SidebarMenuItem
             onClick={(e) => {
@@ -28,7 +25,7 @@ export default function SidebarMenuExtensionItemWrapper({
                 e.preventDefault();
                 e.stopPropagation();
             }}
-            className={`relative ${activeId === link.split('/').pop() ? 'bg-accent hover:bg-accent/30' : ''}`}
+            className={`relative ${activeId === link.split('/').pop() ? 'bg-accent hover:bg-accent/40' : ''}`}
             style={{ WebkitAppRegion: 'no-drag' } as any}>
         {/* This wrapper prevents the Sidebar from breaking */}
         <div
@@ -47,19 +44,28 @@ export default function SidebarMenuExtensionItemWrapper({
             "
             >
             {/* Icon stays fixed size → no shifting */}
-            <Icon src={icon} className="shrink-0 mx-3" themeColor={theme as ("dark" | "light" | undefined) ?? "light"} />
+            <Icon src={icon} className="shrink-0 mx-3.5" themeColor={theme as ("dark" | "light" | undefined) ?? "light"} />
 
             {/* Text reveals only when open */}
             <span
                 className={`
                 transition-opacity duration-200
-                ${isOpen ? "opacity-100" : "opacity-0"}
+                opacity-0
                 whitespace-nowrap
                 `}
             >
                 {title}
             </span>
-            </Link>
+                </Link>
+                    {activeId === link.split('/').pop() && (
+                    <div
+                        className="
+                        absolute left-0 top-1/2 -translate-y-1/2
+                        w-1 h-8 bg-gray-700 dark:bg-white rounded-r-full
+                        animate-in slide-in-from-left-2 duration-300
+                        "
+                    />
+                )}
         </div>
         </SidebarMenuItem>
     );

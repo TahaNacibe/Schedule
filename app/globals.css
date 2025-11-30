@@ -184,18 +184,19 @@ nav {
 ::-webkit-scrollbar {
   width: 10px; /* Vertical width */
   height: 4px; /* Horizontal height */
+  padding-top: 40px;
 }
 
 /* Track (background) */
 ::-webkit-scrollbar-track {
-  padding-top: 40px;
+  padding-top: 80px;
   background: #f1f1f1; /* Light theme: Soft white-gray */
   border-radius: 0; /* Square overall */
 }
 
 /* Thumb (moving part) - Square and theme-blended */
 ::-webkit-scrollbar-thumb {
-  background: #c1c1c1; /* Light: Neutral mid-gray (blends with white) */
+  background: #e2e2e2; /* Light: Neutral mid-gray (blends with white) */
   border-radius: 0; /* Square edges */
   border: 1px solid #f1f1f1; /* Subtle border for definition */
 }
