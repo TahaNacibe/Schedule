@@ -1,6 +1,7 @@
 import { useAuth } from "@/hooks/useAuth"
 import {
     ACCESS_REJECTED, ERROR_COMPLETING_TASK, MISSING_REQUIRED_ARGUMENT,
+    TARGET_ALREADY_EXIST,
     TARGET_WAS_NOT_FOUND, TASK_COMPLETED_SUCCESSFULLY, UNKNOWN_ERROR
 } from "@/lib/errors_handlers"
 import { db } from "@/lib/firebase"
@@ -47,11 +48,10 @@ function generateSearchTokens(text: string): string[] {
  * @returns {string} The generated request ID.
  */
 
-function createRequestId({ sender_id, receiver_id }
+function _createRequestId({ sender_id, receiver_id }
     : { sender_id: string, receiver_id: string }) {
     return [sender_id, receiver_id].sort().join("_")
     }
-
 
 
 
@@ -138,9 +138,13 @@ async function fetchUsersProfiles({ user_ids, currentUser_id }
     try {
         const usersDocs = await getDocs(query(USERS_COLLECTION,
             where("user_id", "in", user_ids)))
-    
-        if (usersDocs.docs.length < 0) 
-            return TASK_COMPLETED_SUCCESSFULLY([])
+            
+        // in case call this user 
+        if (user_ids.length === 1 && user_ids[0] === currentUser_id) 
+            return TASK_COMPLETED_SUCCESSFULLY({
+                ...usersDocs.docs[0].data(),
+                state: null
+            })
 
         const users = usersDocs.docs.map((user) => {
             return user.data()
@@ -230,6 +234,12 @@ async function createFriendRequest({ sender_id, receiver_id }
     if (!sender_id || !receiver_id)
         return MISSING_REQUIRED_ARGUMENT
 
+    const request_id = _createRequestId({sender_id, receiver_id})
+    const requestDocRef = await getDoc(doc(REQUESTS_COLLECTION, request_id))
+
+    if (requestDocRef.exists())
+        return TARGET_ALREADY_EXIST
+
     try {
         const data = {
             "sender_id": sender_id,
@@ -237,9 +247,9 @@ async function createFriendRequest({ sender_id, receiver_id }
             "createdAt": Timestamp.now,
             "updatedAt": Timestamp.now,
             "status": "PENDING",
-            "request_id": createRequestId({sender_id, receiver_id})
+            "request_id": request_id
         }
-        const requestsRef = doc(REQUESTS_COLLECTION, createRequestId({sender_id, receiver_id}))
+        const requestsRef = doc(REQUESTS_COLLECTION, request_id)
         await setDoc(requestsRef, data,)
         return TASK_COMPLETED_SUCCESSFULLY(data)
     } catch (error) {
@@ -325,18 +335,28 @@ async function fetchUsersListBasedOnState({
         return MISSING_REQUIRED_ARGUMENT
 
     try {
-        const targetRequestsDocs = await getDocs(query(REQUESTS_COLLECTION,
-            where("status", "==", target_status)))
-        if (targetRequestsDocs.empty)
-            return TASK_COMPLETED_SUCCESSFULLY([])
+        const sentRequestsQuery = query(
+        REQUESTS_COLLECTION,
+        where("status", "==", target_status),
+        where("sender_id", "==", user_id)
+        );
+        const receivedRequestsQuery = query(
+        REQUESTS_COLLECTION,
+        where("status", "==", target_status),
+        where("receiver_id", "==", user_id)
+        );
+        const [sentSnapshot, receivedSnapshot] = await Promise.all([
+        getDocs(sentRequestsQuery),
+        getDocs(receivedRequestsQuery)
+        ]);
 
-        // Fetch requests that are matching the state
-        const data = targetRequestsDocs.docs.map((request) => {
-            return request.data()
-        })
+        const requests = [
+        ...sentSnapshot.docs.map(d => d.data()),
+        ...receivedSnapshot.docs.map(d => d.data())
+        ];
 
         // fetch users from requests
-        const targetUsersIds = data.map((request) => {
+        const targetUsersIds = requests.map((request) => {
             return request.sender_id, request.receiver_id
         })
         const filtered_list : string [] = targetUsersIds.filter((id) => id != user_id)
@@ -372,7 +392,7 @@ async function getFriendState({
 
     try {
         const request = await getDoc(doc(REQUESTS_COLLECTION,
-            createRequestId({ sender_id: user_id, receiver_id: otherUser_id })))
+            _createRequestId({ sender_id: user_id, receiver_id: otherUser_id })))
         
         if (!request.exists())
             return TASK_COMPLETED_SUCCESSFULLY(null)

@@ -17,6 +17,7 @@ import { useEffect, useState } from "react";
 import SidebarMenuExtensionItemWrapper from "../wrappers_sub_components/sidebar_extenstion";
 import { useAuth } from "@/hooks/useAuth";
 import Link from "next/link";
+import { useExtensionsManager } from "@/contexts/ExtensionManagerContext";
 
 export default function SideBar() {
   // Sidebar state
@@ -24,7 +25,7 @@ export default function SideBar() {
   const [activeExtensionId, setActiveExtensionId] = useState<string | null>("Home-001");
   const [error, setError] = useState<string | null>(null);
   const { state } = useSidebar();
-  const { readExtensions, updateExtensions } = useAppAPI();
+  const { readExtensions, updateExtensionsList } = useExtensionsManager();
   const {user} = useAuth()
   
   // Load extensions on mount (if needed)
@@ -38,7 +39,7 @@ export default function SideBar() {
       // update context
       if (extensionsList && extensionsList.length > 0) {
         setActiveExtensionId(extensionsList[0].id);
-        updateExtensions(extensionsList);
+        updateExtensionsList(extensionsList);
           console.log("updated extensions in context");
           setIsLoadingExtensions(false);
       } else {
