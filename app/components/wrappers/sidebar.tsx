@@ -17,6 +17,7 @@ import { useAuth } from "@/hooks/useAuth";
 import Link from "next/link";
 import { useExtensionsManager } from "@/contexts/ExtensionManagerContext";
 import LoadingSpinner from "@/components/costume/loading_spinner";
+import { useProfile } from "@/contexts/ProfileContext";
 
 export default function SideBar() {
   const [activeExtensionId, setActiveExtensionId] = useState<string | null>(
@@ -25,6 +26,7 @@ export default function SideBar() {
   const { readExtensions, loadExtensionsList, getExtensionsLoadingState } =
     useExtensionsManager();
   const { user } = useAuth();
+  const {getCurrentUserProfile} = useProfile()
 
   const fetchUserExtensions = async () => {
     await loadExtensionsList();
@@ -58,7 +60,7 @@ export default function SideBar() {
                   setActiveExtensionId("/")
                 }}
                 href={"/home"} className="relative">
-                <SidebarProfileComponent src={user?.photoURL} />
+                <SidebarProfileComponent src={getCurrentUserProfile()?.photo_URL} />
                 {activeExtensionId === "/" && (
                   <div
                     key={index}

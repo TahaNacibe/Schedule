@@ -154,7 +154,7 @@ ipcMain.handle('get-extensions', async () => {
 ipcMain.handle('select-file', async () => {
   const result = await dialog.showOpenDialog({
     properties: ['openFile'],
-    filters: [{ name: 'Images', extensions: ['jpg', 'png', 'gif'] }],
+    filters: [{ name: 'Images', extensions: ['jpg', 'png', 'gif', "jpeg"] }],
   });
   return result.canceled ? null : result.filePaths[0];
 });
