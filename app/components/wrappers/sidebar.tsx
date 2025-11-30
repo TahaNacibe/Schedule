@@ -53,6 +53,7 @@ export default function SideBar() {
           if (index == 0) {
             return (
               <Link
+              key={index}
                 onClick={(e) => {
                   setActiveExtensionId("/")
                 }}
@@ -97,11 +98,10 @@ export default function SideBar() {
               <SidebarMenuExtensionItemWrapper
                 key={ext.id + index}
                 activeId={activeExtensionId!}
-                onClick={() => {
+                onLinkPress={() => {
                   setActiveExtensionId(ext.id);
                 }}
                 icon={`/extensions/${ext.id}/icon.svg`}
-                title={ext.manifest.name}
                 link={`/extensions/${ext.id}`}
               />
             ))}

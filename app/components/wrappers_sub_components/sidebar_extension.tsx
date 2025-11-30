@@ -9,20 +9,20 @@ export default function SidebarMenuExtensionItemWrapper({
   title,
   link,
   activeId,
-  onClick,
+  onLinkPress,
 }: {
   icon: string;
   title: string;
   link: string;
   activeId: string;
-  onClick?: () => void;
+  onLinkPress?: () => void;
 }) {
   const { theme } = useTheme();
   console.log("Rendering SidebarMenuExtensionItemWrapper for ", theme);
   return (
     <SidebarMenuItem
       onClick={(e) => {
-        onClick && onClick();
+        onLinkPress && onLinkPress();
         e.preventDefault();
         e.stopPropagation();
       }}

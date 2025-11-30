@@ -6,6 +6,7 @@ import {
 } from "@/lib/errors_handlers"
 import { db } from "@/lib/firebase"
 import FriendRequest from "@/Types/request";
+import { User } from "firebase/auth";
 import {
     collection, deleteDoc, doc, getDoc, getDocs, limit,
     query, setDoc, Timestamp, updateDoc, where
@@ -90,15 +91,16 @@ async function createPublicUser(profile: Profile) {
  */
 interface UpdateUserInterface {
     user_id: string,
-    profile: Profile
+    profile: Profile,
+    user: User
 }
 
 //
 async function updatePublicUser({
     user_id,
-    profile
+    profile,
+    user
 }: UpdateUserInterface) {
-    const {user} = useAuth()
 
     try {
         if (!user || user.uid != user_id) 
@@ -141,10 +143,10 @@ async function fetchUsersProfiles({ user_ids, currentUser_id }
             
         // in case call this user 
         if (user_ids.length === 1 && user_ids[0] === currentUser_id) 
-            return TASK_COMPLETED_SUCCESSFULLY({
+            return TASK_COMPLETED_SUCCESSFULLY([{
                 ...usersDocs.docs[0].data(),
                 state: null
-            })
+            }])
 
         const users = usersDocs.docs.map((user) => {
             return user.data()
