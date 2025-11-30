@@ -44,13 +44,15 @@ export default function Home() {
   };
 
   const testUnite = async () => {
-    const state = await deleteDataFromAnotherExt({
+    const state = await createDocInAnotherExtensionCollection({
       targetExt_id: "test-1",
       targetExt_allowList: [{id:  "test-unite", permission: "READ-WRITE"}],
       activeExt_id: "test-unite",
       user_id: user?.uid ?? "TempUser",
       collection_name: "journals",
-      targetItem_id: "5qcSHy5cPhilBGqLo6zH",
+      payload: {
+        "something": "kjshdfkjsfjdfs"
+      }
     })
     console.log(state)
   }
