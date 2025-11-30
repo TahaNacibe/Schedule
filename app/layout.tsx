@@ -6,6 +6,8 @@ import SideBar from "./components/wrappers/sidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
 import { AppAPIProvider } from "@/contexts/AppAPI";
 import { ThemeProvider } from "next-themes";
+import { ProfileApiProvider } from "@/contexts/ProfileContext";
+import { ExtensionsApiProvider } from "@/contexts/ExtensionManagerContext";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -33,17 +35,21 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased overflow-y-hidden`}
       >
         <ThemeProvider defaultTheme="dark">
-        <AppAPIProvider>
-        <SidebarProvider defaultOpen={false}>
-          <div className="flex flex-col w-full relative">
-            <CustomTitleBar />
-          <main>
-          <SideBar />
-          {children}
-          </main>
-          </div>
-        </SidebarProvider>
-        </AppAPIProvider>
+          <AppAPIProvider>
+            <ProfileApiProvider>
+              <ExtensionsApiProvider>
+                <SidebarProvider defaultOpen={false}>
+                  <div className="flex flex-col w-full relative">
+                    <CustomTitleBar />
+                    <main>
+                      <SideBar />
+                      {children}
+                    </main>
+                  </div>
+                </SidebarProvider>
+              </ExtensionsApiProvider>
+            </ProfileApiProvider>
+          </AppAPIProvider>
         </ThemeProvider>
       </body>
     </html>
