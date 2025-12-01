@@ -7,13 +7,12 @@ import {
   SidebarFooter,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
-import { Settings, ShoppingBag, Users } from "lucide-react";
+import { ShoppingBag } from "lucide-react";
 import SidebarMenuItemWrapper from "../wrappers_sub_components/sidebar_menu_item";
 import { ThemeTogglerButton } from "@/components/animate-ui/components/buttons/theme-toggler";
 import SidebarProfileComponent from "../wrappers_sub_components/sidebar_profile_component";
 import { useEffect, useState } from "react";
 import SidebarMenuExtensionItemWrapper from "../wrappers_sub_components/sidebar_extension";
-import { useAuth } from "@/hooks/useAuth";
 import Link from "next/link";
 import { useExtensionsManager } from "@/contexts/ExtensionManagerContext";
 import LoadingSpinner from "@/components/costume/loading_spinner";
@@ -25,8 +24,7 @@ export default function SideBar() {
   );
   const { readExtensions, loadExtensionsList, getExtensionsLoadingState } =
     useExtensionsManager();
-  const { user } = useAuth();
-  const {getCurrentUserProfile} = useProfile()
+  const {userProfile} = useProfile()
 
   const fetchUserExtensions = async () => {
     await loadExtensionsList();
@@ -38,7 +36,6 @@ export default function SideBar() {
 
   const quickActionOptions = [
     {title: "PROFILE_PLACE_HOLDER", icon: null},
-    { title: "SOCIALS", icon: Users },
     { title: "STORE", icon: ShoppingBag },
   ];
 
@@ -60,7 +57,7 @@ export default function SideBar() {
                   setActiveExtensionId("/")
                 }}
                 href={"/home"} className="relative">
-                <SidebarProfileComponent src={getCurrentUserProfile()?.photo_URL} />
+                <SidebarProfileComponent src={userProfile?.photo_URL} />
                 {activeExtensionId === "/" && (
                   <div
                     key={index}
@@ -115,7 +112,7 @@ export default function SideBar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <ThemeTogglerButton
-              modes={["dark", "light"]}
+              modes={["light", "dark"]}
               className="bg-sidebar! text-primary shadow-none rounded-none p-2 
             hover:bg-accent! transition-all duration-200 w-full border-t dark:border-gray-700 border-gray-200"
             />

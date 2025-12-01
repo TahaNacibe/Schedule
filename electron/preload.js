@@ -15,3 +15,16 @@ contextBridge.exposeInMainWorld('electronAPI', {
     selectFile: () => ipcRenderer.invoke('select-file'),
     uploadFile: (filePath, ext_id) => ipcRenderer.invoke('upload-file', filePath, ext_id),
 });
+
+
+// window api
+window.addEventListener("DOMContentLoaded", () => {
+    document.addEventListener("keydown", (e) => {
+        window.postMessage({
+        type: "global-keydown",
+        key: e.key,
+        ctrl: e.ctrlKey,
+        meta: e.metaKey
+        });
+    });
+});

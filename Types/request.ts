@@ -8,3 +8,4 @@ export default interface FriendRequest {
         updatedAt: Timestamp,
         status: "PENDING" | "ACCEPTED" | "IGNORED"
 }
+

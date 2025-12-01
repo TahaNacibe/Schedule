@@ -9,25 +9,24 @@ import {
 import { auth } from "@/lib/firebase";
 import { useAuth } from "@/hooks/useAuth";
 import { useAppAPI } from "@/contexts/AppAPI";
+import { useProfile } from "@/contexts/ProfileContext";
 
 export default function Auth() {
   const { user, loading, error } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [signInError, setSignInError] = useState<string | null>(null);
-  const { setUserId, setUserSignedIn } = useAppAPI();
+  const { updateAuthState } = useProfile();
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
       await signInWithEmailAndPassword(auth, email, password);
-      setUserSignedIn(true);
-      setUserId(user?.uid ?? null);
+      updateAuthState(true);
     } catch (err) {
       console.log(err);
       setSignInError((err as Error).message || "Sign-in failed");
-      setUserSignedIn(false);
-      setUserId(null);
+      updateAuthState(false);
     }
   };
 
@@ -46,21 +45,18 @@ export default function Auth() {
         photoURL:
           "https://i.pinimg.com/736x/38/08/7b/38087bb8ba16981f280a3bda0bf0a1f5.jpg",
       });
-      setUserSignedIn(true);
-      setUserId(user?.uid ?? null);
+      updateAuthState(true);
     } catch (err) {
       console.log(err);
       setSignInError((err as Error).message || "Sign-in failed");
-      setUserSignedIn(false);
-      setUserId(null);
+      updateAuthState(false);
     }
   };
 
   const handleSignOut = async () => {
     try {
       await signOut(auth);
-      setUserSignedIn(false);
-      setUserId(null);
+      updateAuthState(false);
     } catch (error) {
       console.log(error);
       setSignInError((error as Error).message || "Sign-in failed");

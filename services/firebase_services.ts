@@ -1,4 +1,3 @@
-import { useAuth } from "@/hooks/useAuth"
 import {
     ACCESS_REJECTED, ERROR_COMPLETING_TASK, MISSING_REQUIRED_ARGUMENT,
     TARGET_ALREADY_EXIST,
@@ -152,15 +151,19 @@ async function fetchUsersProfiles({ user_ids, currentUser_id }
             return user.data()
         })
 
-        const usersWithFriendState = users.map(async (user) => {
-            const res = await getFriendState({ user_id:currentUser_id, otherUser_id: user.user_id })
-            if (res.success) {
-                return {
-                    ...user,
-                    state: !res.data ? null : (res.data as FriendRequest).status
+        const usersWithFriendState = await Promise.all(
+            users.map(async (user) => {
+                const res = await getFriendState({ user_id:currentUser_id, otherUser_id: user.user_id });
+                if (res.success) {
+                    return {
+                        ...user,
+                        state: !res.data ? null : (res.data as FriendRequest).status
+                    } as Profile;
                 }
-            }
-        })
+                return { ...user, state: null } as Profile; // handle failure case
+            })
+        );
+
             return TASK_COMPLETED_SUCCESSFULLY(usersWithFriendState)
         } catch (error) {
             if (error instanceof Error) {
@@ -188,7 +191,8 @@ async function searchUsers({user_name, user_id}:{user_name:string, user_id:strin
     
     try {
         const userDocs = await getDocs(query(USERS_COLLECTION,
-            where("searchKeyWords", "array-contains", user_name.toLowerCase()), limit(10)))
+            where("searchKeyWords", "array-contains", user_name.toLowerCase()),
+            where("profile_visibility", "==", true), limit(10)))
 
         if (userDocs.docs.length == 0) 
             return TASK_COMPLETED_SUCCESSFULLY([])
@@ -198,15 +202,18 @@ async function searchUsers({user_name, user_id}:{user_name:string, user_id:strin
         })
 
         // fetch friend state
-        const usersWithFriendState = users.map(async (user) => {
-            const res = await getFriendState({ user_id, otherUser_id: user.user_id })
+        const usersWithFriendState = await Promise.all(
+        users.map(async (user) => {
+            const res = await getFriendState({ user_id, otherUser_id: user.user_id });
             if (res.success) {
                 return {
                     ...user,
                     state: !res.data ? null : (res.data as FriendRequest).status
-                }
+                } as Profile;
             }
+            return { ...user, state: null } as Profile; // handle failure case
         })
+    );
 
         return TASK_COMPLETED_SUCCESSFULLY(usersWithFriendState)
     } catch (error) {
@@ -246,8 +253,8 @@ async function createFriendRequest({ sender_id, receiver_id }
         const data = {
             "sender_id": sender_id,
             "receiver_id": receiver_id,
-            "createdAt": Timestamp.now,
-            "updatedAt": Timestamp.now,
+            "createdAt": Timestamp.now(),
+            "updatedAt": Timestamp.now(),
             "status": "PENDING",
             "request_id": request_id
         }
@@ -332,7 +339,7 @@ interface FetchUsersListBasedOnStateInterface {
 
 async function fetchUsersListBasedOnState({
     user_id, target_status
-}:FetchUsersListBasedOnStateInterface) {
+}: FetchUsersListBasedOnStateInterface) {
     if (!user_id || !target_status)
         return MISSING_REQUIRED_ARGUMENT
 
@@ -351,19 +358,42 @@ async function fetchUsersListBasedOnState({
         getDocs(sentRequestsQuery),
         getDocs(receivedRequestsQuery)
         ]);
-
         const requests = [
         ...sentSnapshot.docs.map(d => d.data()),
         ...receivedSnapshot.docs.map(d => d.data())
         ];
 
         // fetch users from requests
-        const targetUsersIds = requests.map((request) => {
-            return request.sender_id, request.receiver_id
-        })
-        const filtered_list : string [] = targetUsersIds.filter((id) => id != user_id)
-        const usersResp = await fetchUsersProfiles({ user_ids: filtered_list, currentUser_id:user_id })
+        const targetUsersIds = requests.map((r) =>
+            r.sender_id === user_id ? r.receiver_id : r.sender_id
+        );
+        const usersResp = await fetchUsersProfiles({ user_ids: targetUsersIds, currentUser_id: user_id })
+
+        if (target_status === "ACCEPTED") {
+            return usersResp
+        }
+        
+        let received_requests : FriendRequest[] = []
+        let sent_requests : FriendRequest[] = []
+        // get state 
+        if (usersResp.success) {
+            for (const user of usersResp.data as Profile[]) {
+                let target = requests.filter((req) => req.sender_id === user.user_id);
+                if (target.length > 0) {
+                    sent_requests.push(target[0] as FriendRequest);
+                    continue;
+                }
+
+                target = requests.filter((req) => req.receiver_id === user.user_id);
+                if (target.length > 0) {
+                    received_requests.push(target[0] as FriendRequest);
+                    continue;
+                }
+            }
+            return TASK_COMPLETED_SUCCESSFULLY({received_requests, sent_requests, users:usersResp.data})
+        }
         return usersResp
+        // 
     } catch (error) {
         if (error instanceof Error)
             return ERROR_COMPLETING_TASK(error)

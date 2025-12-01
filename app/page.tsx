@@ -1,17 +1,7 @@
 "use client";
-import {
-  clearUserDataFromDB,
-  deleteDataFromDB,
-  readDataFromDB,
-  writeDataToDB,
-} from "@/middleware/firebase_middleware";
 import Auth from "./components/auth/auth";
-import { useAppAPI } from "@/contexts/AppAPI";
 import { useAuth } from "@/hooks/useAuth";
-import { updateCurrentUser, updateProfile } from "firebase/auth";
 import { useEffect, useState } from "react";
-import cloudinaryMiddleware from "@/middleware/cloudinary_middleware";
-import { auth } from "@/lib/firebase";
 import { createDocInAnotherExtensionCollection, deleteDataFromAnotherExt, readDataFromAnotherExt, updateDataInAnotherExtData } from "@/middleware/inter_extension_middleware";
 import { useProfile } from "@/contexts/ProfileContext";
 

@@ -42,7 +42,7 @@ export default function RootLayout({
                   <div className="flex flex-col w-full relative">
                     <CustomTitleBar />
                     <SideBar />
-                    <main className="overflow-y-scroll! h-screen">
+                    <main>
                         {children}
                     </main>
                   </div>
