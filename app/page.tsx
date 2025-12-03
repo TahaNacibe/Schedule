@@ -1,47 +1,54 @@
 "use client";
-import Auth from "./components/auth/auth";
 import { useAuth } from "@/hooks/useAuth";
-import { useEffect, useState } from "react";
-import { createDocInAnotherExtensionCollection, deleteDataFromAnotherExt, readDataFromAnotherExt, updateDataInAnotherExtData } from "@/middleware/inter_extension_middleware";
+import { useEffect, useState, useMemo } from "react";
 import { useProfile } from "@/contexts/ProfileContext";
-
-
+import ProfilePage from "./home/page";
+import LoadingSpinner from "@/components/costume/loading_spinner";
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
   const { user } = useAuth();
-  const { fetchUserProfile } = useProfile();
-  const [selectedFile, setSelectedFile] = useState<string | null>(null)
+  const router = useRouter();
+  const [isProfileReady, setIsProfileReady] = useState(false)
+  const { fetchUserProfile, userProfile } = useProfile();  // Assuming profile is exposed from context
 
-  
+  const handleLoadProfile = useMemo(() => async () => {
+    // Skip if profile is already loaded (memoized check)
+    if (userProfile) {
+      setIsProfileReady(true);
+      return;
+    }
 
-  const testUnite = async () => {
-    const state = await createDocInAnotherExtensionCollection({
-      targetExt_id: "test-1",
-      targetExt_allowList: [{id:  "test-unite", permission: "READ-WRITE"}],
-      activeExt_id: "test-unite",
-      user_id: user?.uid ?? "TempUser",
-      collection_name: "journals",
-      payload: {
-        "something": "kjshdfkjsfjdfs"
-      }
-    })
-    console.log(state)
-  }
+    const res = await fetchUserProfile()
+    if (res.success) {
+      setIsProfileReady(true)
+    }
+    
+    if(isProfileReady && !res.success) {
+      // redirect into error
+      router.push('/error');
+    }
+  }, [fetchUserProfile, userProfile, isProfileReady, router]);  // Dependencies for memoization
 
   useEffect(() => {
-    fetchUserProfile()
-  },[user])
+    handleLoadProfile()
+  }, [user, handleLoadProfile])  // Include memoized handler in deps
+
+  if (!isProfileReady) {
+    return (
+      <div className="w-screen h-screen z-50 bg-background flex items-center justify-center gap-4 flex-col absolute">
+        <LoadingSpinner size="w-14 h-14" />
+        <div className="flex flex-col justify-center items-center">
+          <h1 className="text-2xl">
+          <span className="text-xl text-gray-600">Loading your </span>  extensions <span className="text-xl text-gray-600">and</span> profile...
+        </h1>
+        <p className="text-sm">This may take a moment</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
-    <div className="w-screen h-screen flex flex-col justify-center items-center">
-      <Auth />
-      {/* experimental area  */}
-        <button
-        className="border-2 border-dashed border-white mt-8 w-24"
-        onClick={testUnite}
-      >
-        Test unite
-      </ button>
-    </div>
+    <ProfilePage />
   );
 }

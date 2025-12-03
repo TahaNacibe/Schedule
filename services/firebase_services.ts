@@ -122,6 +122,63 @@ async function updatePublicUser({
 }
 
 
+interface UpdateVisibilityInterface {
+    user_id: string | null,
+    newState: boolean,
+    user: User | null
+}
+
+async function updateProfileVisibility({
+    user_id,
+    newState,
+    user
+}: UpdateVisibilityInterface) {
+
+    try {
+        if (!user || user.uid != user_id) 
+            return ACCESS_REJECTED
+
+        const userDocRef = doc(USERS_COLLECTION, user_id)
+        await updateDoc(userDocRef, {
+            "profile_visibility": newState,
+            "updateAt": Timestamp.now(),
+        })
+
+        return TASK_COMPLETED_SUCCESSFULLY(null)
+    } catch (error) {
+        if (error instanceof Error) {
+            return ERROR_COMPLETING_TASK(error)
+        }
+        return UNKNOWN_ERROR
+    }
+}
+
+
+async function updateFriendsVisibility({
+    user_id,
+    newState,
+    user
+}: UpdateVisibilityInterface) {
+
+    try {
+        if (!user || user.uid != user_id) 
+            return ACCESS_REJECTED
+
+        const userDocRef = doc(USERS_COLLECTION, user_id)
+        await updateDoc(userDocRef, {
+            "friends_visibility": newState,
+            "updateAt": Timestamp.now(),
+        })
+
+        return TASK_COMPLETED_SUCCESSFULLY(null)
+    } catch (error) {
+        if (error instanceof Error) {
+            return ERROR_COMPLETING_TASK(error)
+        }
+        return UNKNOWN_ERROR
+    }
+}
+
 
 
 /**
@@ -441,6 +498,8 @@ async function getFriendState({
 export {
     createPublicUser,
     updatePublicUser,
+    updateFriendsVisibility,
+    updateProfileVisibility,
     fetchUsersProfiles,
     searchUsers,
     createFriendRequest,

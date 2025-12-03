@@ -1,6 +1,6 @@
-import { FriendActions } from "@/app/home/components/friends_actions";
-import { FriendAvatar } from "@/app/home/components/friends_avatar";
-import { FriendInfo } from "@/app/home/components/friends_info";
+import { FriendActions } from "@/app/home/components/profile/friends_actions";
+import { FriendAvatar } from "@/app/home/components/profile/friends_avatar";
+import { FriendInfo } from "@/app/home/components/profile/friends_info";
 import { useProfile } from "@/contexts/ProfileContext";
 import { useAuth } from "@/hooks/useAuth";
 import Link from "next/link";
@@ -34,14 +34,12 @@ export function OthersFriendItem({
 
         const received_ids_requests = requests.received_requests.map((request) => request.receiver_id)
         if (received_ids_requests.includes(target_id)) {
-                console.log("action one")
                 set_request_state("SENT")
                 return "request"
             }
         
         const sent_ids_requests = requests.sent_requests.map((request) => request.sender_id)
         if (sent_ids_requests.includes(target_id)) {
-            console.log("action 2" + target_id)
                 set_request_state("RECEIVED")
                 return "request"
         }

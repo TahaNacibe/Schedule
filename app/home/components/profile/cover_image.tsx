@@ -18,7 +18,7 @@ export function CoverImage({
     onUpdate,
 }: CoverImageProps) {
     return (
-    <div className="relative w-full h-72 bg-linear-to-r from-blue-500 to-purple-600 overflow-hidden">
+    <div className="relative w-full h-80 bg-accent overflow-hidden">
         {(selectedImage || coverUrl != null) && (
             <img
             src={selectedImage || coverUrl!}
@@ -38,7 +38,7 @@ export function CoverImage({
             disabled={isUpdating}
             variant="secondary"
             size="sm"
-            className="absolute bottom-4 right-4 rounded-full shadow-lg cursor-pointer z-20"
+            className="absolute bottom-4 right-4 rounded-full shadow-lg cursor-pointer z-5"
         >
             {isUpdating ? (
             <div className="flex gap-1">

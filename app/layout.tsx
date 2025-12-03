@@ -8,6 +8,7 @@ import { AppAPIProvider } from "@/contexts/AppAPI";
 import { ThemeProvider } from "next-themes";
 import { ProfileApiProvider } from "@/contexts/ProfileContext";
 import { ExtensionsApiProvider } from "@/contexts/ExtensionManagerContext";
+import { Toaster } from "@/components/ui/sonner"
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -45,6 +46,7 @@ export default function RootLayout({
                     <main>
                         {children}
                     </main>
+                    <Toaster />
                   </div>
                 </SidebarProvider>
               </ExtensionsApiProvider>

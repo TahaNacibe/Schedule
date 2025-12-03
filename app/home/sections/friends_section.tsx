@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { useFriendsManagement } from "@/hooks/user_friends_managements";
-import { FriendsList } from "../components/friends_list";
-import { FriendsTabList } from "../components/friends_tabList";
-import { RequestsList } from "../components/requests_list";
-import EmptyListPlaceHolder from "../components/empty_list_placeholder";
 import { UserPlus, Users } from "lucide-react";
 import SearchDialog from "../dialogs/search_dialog";
+import EmptyListPlaceHolder from "../components/profile/empty_list_placeholder";
+import { FriendsList } from "../components/profile/friends_list";
+import { FriendsTabList } from "../components/profile/friends_tabList";
+import { RequestsList } from "../components/profile/requests_list";
 
 
 export default function FriendsSection() {
@@ -20,7 +20,7 @@ export default function FriendsSection() {
   } = useFriendsManagement();
 
   return (
-    <div className="flex-1 border-l border-t border-accent bg-card flex flex-col pt-2">
+    <div className="w-2/4 lg:w-1/4 border-l border-t border-accent bg-card lg:flex flex-col pt-2 hidden">
       <div className="pt-0.5 pb-1 px-2">
         <SearchDialog />
       </div>

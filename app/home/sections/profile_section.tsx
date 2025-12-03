@@ -1,11 +1,10 @@
 import { useImageUpload } from "@/hooks/use_image_upload";
 import { useProfileUpdate } from "@/hooks/use_profile_updater";
-import { CoverImage } from "../components/cover_image";
-import { ProfileAvatar } from "../components/profile_avatar";
-import { ProfileHeader } from "../components/profile_header";
+import { CoverImage } from "../components/profile/cover_image";
+import { ProfileAvatar } from "../components/profile/profile_avatar";
+import { ProfileHeader } from "../components/profile/profile_header";
 
 
-const DEFAULT_PHOTO = "https://api.dicebear.com/7.x/avataaars/svg?seed=Default";
 
 export function ProfileSection({profile, isLocalProfile}:{profile:Profile,isLocalProfile:boolean}) {  
   const { handleSelectFile } = useImageUpload();
@@ -27,7 +26,6 @@ export function ProfileSection({profile, isLocalProfile}:{profile:Profile,isLoca
     
     if (!imageUrl) {
       setIsProfileImageUpdating(false);
-      console.log("error");
       return;
     }
     
@@ -40,7 +38,6 @@ export function ProfileSection({profile, isLocalProfile}:{profile:Profile,isLoca
     
     if (!imageUrl) {
       setIsCoverImageUpdating(false);
-      console.log("error");
       return;
     }
     
@@ -48,7 +45,7 @@ export function ProfileSection({profile, isLocalProfile}:{profile:Profile,isLoca
   };
 
   return (
-    <div className="flex-4 overflow-y-auto w-full">
+    <div className=" overflow-y-auto w-full">
       <CoverImage
         isLocalProfile={isLocalProfile}
         coverUrl={profile ? profile.cover_URL : null}
@@ -65,7 +62,6 @@ export function ProfileSection({profile, isLocalProfile}:{profile:Profile,isLoca
           selectedImage={selectedProfileImage}
           isUpdating={isProfileImageUpdating}
           onUpdate={handleUpdateProfilePhoto}
-          defaultPhoto={DEFAULT_PHOTO}
         />
 
         <ProfileHeader

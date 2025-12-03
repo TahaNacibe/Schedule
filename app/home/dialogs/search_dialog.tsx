@@ -9,12 +9,13 @@ import {
 } from "@/components/ui/command"
 import { useProfile } from "@/contexts/ProfileContext"
 import { useState, useEffect } from "react"
-import { FriendItem } from "../components/friend_item"
 import { createFriendRequest, searchUsers, updateFriendRequest } from "@/services/firebase_services"
 import { useAuth } from "@/hooks/useAuth"
 import LoadingPinWheel from "@/components/costume/spinner_wheel"
 import { useFriendsManagement } from "@/hooks/user_friends_managements"
 import { MISSING_REQUIRED_ARGUMENT, UNKNOWN_ERROR } from "@/lib/errors_handlers"
+import costumeToast from "@/components/costume/costume_toast"
+import { FriendItem } from "../components/profile/friend_item"
 
 export default function SearchDialog() {
     const [searchKey, setSearchKey] = useState("")
@@ -22,8 +23,8 @@ export default function SearchDialog() {
     const [isSearching, setIsSearching] = useState(false)
     const [open, setOpen] = useState(false)
     //* use hooks
-    const { friends, requests, updateRequestsList, updateFriendsList } = useProfile()
-    const {handleAcceptRequest,handleRejectRequest,handleRemoveFriend} = useFriendsManagement()
+    const { friends, requests, updateRequestsList } = useProfile()
+    const {handleAcceptRequest} = useFriendsManagement()
     const {user} = useAuth()
 
 
@@ -39,6 +40,7 @@ export default function SearchDialog() {
         }
     };
 
+    //? call electron API
     window.addEventListener("message", handler);
     return () => window.removeEventListener("message", handler);
     }, []);
@@ -48,48 +50,50 @@ export default function SearchDialog() {
 
     // handle add friend
     const sendFriendRequest = async (friend_id: string) => {
-        if (!friend_id || !user)
+        if (!friend_id || !user) {
+            costumeToast({ content: MISSING_REQUIRED_ARGUMENT.message, type:"ALERT"})
             return
-        try {
-            const res = await createFriendRequest({ sender_id: user.uid, receiver_id: friend_id })
-            if (res.success) {
-                const target_user = searchUsersResult.filter((user) => user.user_id === friend_id)
-                if (target_user && target_user.length > 0) {
-                    updateRequestsList(target_user[0], false)
-                    const updatedSearchResult = searchUsersResult.filter((user) => user.user_id != friend_id)
-                    setSearchUsersResult(updatedSearchResult)
-                }
-                return;
-            }
-            //ToDo: add error handling
-        } catch (error) {
-            //ToDo: add error handling
         }
+
+        // handle request
+        const res = await createFriendRequest({ sender_id: user.uid, receiver_id: friend_id })
+        if (res.success) {
+            const target_user = searchUsersResult.filter((user) => user.user_id === friend_id)
+            if (target_user && target_user.length > 0) {
+                updateRequestsList(target_user[0], false)
+                const updatedSearchResult = searchUsersResult.filter((user) => user.user_id != friend_id)
+                setSearchUsersResult(updatedSearchResult)
+                // send alert
+                costumeToast({content:"Friend Request sent!", type:"INFO"})
+            }
+            return;
+        }
+        costumeToast({content: res.message, type:"ERROR"})
+
     }
 
     const acceptFriendRequest = async (friend_id: string) => {
-        if (!friend_id || !user)
+        if (!friend_id || !user) {
+            costumeToast({content: MISSING_REQUIRED_ARGUMENT.message, type:"ALERT"})
             return MISSING_REQUIRED_ARGUMENT;
-        try {
-            const request_id = [friend_id, user.uid].sort().join("_")
-            const res = await updateFriendRequest({ request_id, new_state: "ACCEPTED" })
-            if (res.success) {
-                const target_user = requests.users.filter((user) => user.user_id === friend_id)
-                if (target_user && target_user.length > 0) {
-                    handleAcceptRequest(target_user[0], user.uid)
-                    // update search
-                    const updatedSearchResult = searchUsersResult.filter((user) => user.user_id != friend_id)
-                    setSearchUsersResult(updatedSearchResult)
-                }
-            }
-            //ToDo: add error handling
-            return res
-            console.log("fuck me")
-        } catch (error) {
-            //ToDo: add error handling
-            return UNKNOWN_ERROR
-            console.log("fuck me harder" + error)
         }
+
+        const request_id = [friend_id, user.uid].sort().join("_")
+        const res = await updateFriendRequest({ request_id, new_state: "ACCEPTED" })
+        if (res.success) {
+            const target_user = requests.users.filter((user) => user.user_id === friend_id)
+            if (target_user && target_user.length > 0) {
+                handleAcceptRequest(target_user[0], user.uid)
+                // update search
+                const updatedSearchResult = searchUsersResult.filter((user) => user.user_id != friend_id)
+                setSearchUsersResult(updatedSearchResult)
+                // sen alert
+                costumeToast({content:"You're now friends!", type:"INFO"})
+            }
+
+        }
+        costumeToast({content: res.message, type:"ERROR"})
+        return res
     }
 
 
@@ -115,7 +119,7 @@ export default function SearchDialog() {
                 setSearchUsersResult(new_users)
             }
         } catch (error) {
-            console.log("fuck")
+            costumeToast({content: "Something went wrong!", type:"ERROR"})
         } finally {
             setIsSearching(false)
         }

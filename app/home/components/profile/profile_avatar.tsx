@@ -8,7 +8,6 @@ interface ProfileAvatarProps {
     selectedImage: string | null;
     isUpdating: boolean;
     onUpdate: () => void;
-    defaultPhoto: string;
 }
 
 export function ProfileAvatar({
@@ -18,16 +17,24 @@ export function ProfileAvatar({
     selectedImage,
     isUpdating,
     onUpdate,
-    defaultPhoto,
 }: ProfileAvatarProps) {
     return (
         <div className="relative mb-4">
         <div className="relative inline-block">
-            <img
-            src={selectedImage || photoUrl || defaultPhoto}
+            {(selectedImage != null || photoUrl != null)
+            ? <img
+            src={selectedImage! || photoUrl!}
             alt={userName}
             className="w-32 h-32 rounded-full border-6 border-background shadow-xl object-cover top-0"
-            />
+                    />
+                    : <div className="w-32 h-32 rounded-full border-6 border-background shadow-xl object-cover top-0 
+            bg-accent
+            flex items-center justify-center">
+                <h1 className="text-5xl font-semibold">
+                {userName.slice(0,2).toUpperCase()}            
+                </h1>
+            </div>
+                }
             
             {isUpdating && (
             <div className="bg-accent/50 w-32 h-32 absolute top-0 rounded-full flex items-center justify-center">

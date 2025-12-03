@@ -1,0 +1,1 @@
+type AuthMode = 'signin' | 'signup';

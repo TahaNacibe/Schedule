@@ -28,7 +28,7 @@ export function useFriendsManagement() {
       request_id: [requestProfile.user_id, user_id].sort().join("_"),
       new_state: "IGNORED",
     });
-    console.log("response: ", res);
+
     if (res.success) {
       updateRequestsList(requestProfile, true);
     }

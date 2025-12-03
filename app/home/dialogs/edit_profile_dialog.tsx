@@ -1,3 +1,4 @@
+import costumeToast from "@/components/costume/costume_toast";
 import LoadingPinWheel from "@/components/costume/spinner_wheel";
 import { Button } from "@/components/ui/button";
 import { DialogHeader, DialogFooter, Dialog, DialogContent, DialogDescription, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -25,7 +26,10 @@ export default function EditProfileDialog({
 
     const handleProfileUpdate = async () => {
         if (editedName.trim().length === 0 || bio.trim().length === 0) {
-            console.log("can't be empty")
+            costumeToast({
+                content: `${editedName.trim().length === 0 ? "User name can't be empty"
+                    : "a bio must be at least one word"}`, type: "ALERT"
+            })
             return;
         }
         setIsUpdatingProfile(true)

@@ -1,23 +1,16 @@
 'use client';
-import { ThemeTogglerButton } from "@/components/animate-ui/components/buttons/theme-toggler";
-import { SidebarTrigger, useSidebar } from "@/components/ui/sidebar";
 import { Maximize, Minus, X } from "lucide-react";
 
 export default function CustomTitleBar() {
+  //? handle the action in electron API
   const handleWindow = (action: 'minimize' | 'maximize' | 'close') => {
-    console.log('[REACT] Sending action:', action);
     window.electronAPI?.controlWindow(action);
   };
 
-  // Side bar
-  const {
-    state,
-  } = useSidebar()
-
   return (
-    <div className=" z-10 w-full flex justify-end absolute" style={{ WebkitAppRegion: 'drag' } as any} >
+    <div className=" z-40 w-full flex justify-end absolute" style={{ WebkitAppRegion: 'drag' } as any} >
       <div className="flex justify-end pl-12 w-full">
-        <div className="flex" style={{ WebkitAppRegion: 'no-drag' } as any}>
+        <div className="flex backdrop-blur-md rounded-bl-lg" style={{ WebkitAppRegion: 'no-drag' } as any}>
         {/* Controller buttons */}
         <button 
         className="controller-button px-3.5 py-2 hover:bg-gray-200/50 transition-all duration-200"

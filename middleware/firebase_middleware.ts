@@ -35,12 +35,9 @@ const extCollectionPathRef = ({
   ext_id: string;
   user_id: string;
 }) => {
-  console.log("ext path -- user_id : " + user_id);
-  console.log("ext path -- collection_name : " + collection_name);
   const extCollRef = collection(db, ext_id);
   const spicCollRef = doc(extCollRef, collection_name);
   const userDocRef = collection(spicCollRef, user_id);
-  console.log(userDocRef);
   return userDocRef;
 };
 
@@ -133,8 +130,6 @@ async function writeDataToDB({
   user_id,
   payload,
 }: writeDataToDBInterface): Promise<CustomResponse> {
-  console.log("firebase -- user_id : " + user_id);
-  console.log("firebase -- collection_name : " + collection_name);
   //? Null check
   if (!collection_name || !payload || !user_id || !ext_id) {
     return MISSING_REQUIRED_ARGUMENT;

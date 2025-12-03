@@ -10,7 +10,7 @@ export function useProfileUpdate() {
   const [selectedCoverImage, setSelectedCoverImage] = useState<string | null>(null);
   const [isCoverImageUpdating, setIsCoverImageUpdating] = useState(false);
   
-  const { getCurrentUserProfile, updateCurrentUser } = useProfile();
+  const { userProfile, updateCurrentUser } = useProfile();
   const { user } = useAuth();
 
   const updateProfilePhoto = async (imageUrl: string) => {
@@ -20,7 +20,7 @@ export function useProfileUpdate() {
     await updateProfile(user, { photoURL: imageUrl });
     
     const updatedProfile = {
-      ...getCurrentUserProfile()!,
+      ...userProfile!,
       photo_URL: imageUrl,
     };
     
@@ -41,7 +41,7 @@ export function useProfileUpdate() {
     setSelectedCoverImage(imageUrl);
     
     const updatedProfile = {
-      ...getCurrentUserProfile()!,
+      ...userProfile!,
       cover_URL: imageUrl,
     };
     
@@ -60,7 +60,7 @@ export function useProfileUpdate() {
     if (!user) return;
 
     const updatedProfile = {
-      ...getCurrentUserProfile()!,
+      ...userProfile!,
       bio,
       user_name: userName
     };

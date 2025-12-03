@@ -9,6 +9,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
 
     // extension control
     installExtension: (url) => ipcRenderer.invoke('install-extension', url),
+    uninstallExtension: (id) => ipcRenderer.invoke("uninstall-extension", id),
     readExtensions: () => ipcRenderer.invoke("get-extensions"),
 
     // files

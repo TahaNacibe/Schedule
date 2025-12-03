@@ -1,5 +1,6 @@
 "use client"
 import { useAuth } from '@/hooks/useAuth';
+import { ACCESS_REJECTED, TASK_COMPLETED_SUCCESSFULLY, UNKNOWN_ERROR } from '@/lib/errors_handlers';
 import { fetchUsersListBasedOnState, fetchUsersProfiles } from '@/services/firebase_services';
 import FriendRequestData from '@/Types/friend_request_data';
 import FriendRequest from '@/Types/request';
@@ -12,10 +13,10 @@ type ProfileContextType = {
   friends: Profile[];
   requests: FriendRequestData;
   updateAuthState: (state: boolean) => void;
-  updateCurrentUser: (user: Profile) => void;
+  updateCurrentUser: (user: Profile | null) => void;
   updateFriendsList: (updater: Profile[] | ((prev: Profile[]) => Profile[])) => void;
   updateRequestsList: (targetProfile: Profile, isRemove: boolean) => void;
-  fetchUserProfile: () => Promise<void>;
+  fetchUserProfile: () => Promise<CustomResponse>;
 };
 
 const ProfileContext = createContext<ProfileContextType | undefined>(undefined);
@@ -43,7 +44,7 @@ export function ProfileApiProvider({ children }: { children: React.ReactNode }) 
   }, [user]);
 
   async function fetchUserProfile() {
-    if (!user) return;
+    if (!user) return ACCESS_REJECTED;
     const res = await fetchUsersProfiles({ user_ids: [user.uid], currentUser_id: user.uid });
     if (res.success && res.data!.length > 0) {
       setUserProfile(res.data![0] as Profile);
@@ -51,22 +52,23 @@ export function ProfileApiProvider({ children }: { children: React.ReactNode }) 
       const friendsRes = await fetchUsersListBasedOnState({ user_id: user.uid, target_status: "ACCEPTED" });
       if (friendsRes.success) {
         setFriendsList(friendsRes.data as Profile[]);
-        console.log("updated friends");
       }
 
       const requestsRes = await fetchUsersListBasedOnState({ user_id: user.uid, target_status: "PENDING" });
       if (requestsRes.success) {
         setRequestsLists(requestsRes.data as FriendRequestData);
-        console.log("requests updated");
       }
+
+      return TASK_COMPLETED_SUCCESSFULLY(null)
     }
+    return UNKNOWN_ERROR
   }
 
   const updateAuthState = useCallback((state: boolean) => {
     setUserSignedIn(state);
   }, []);
 
-  const updateCurrentUser = useCallback((user: Profile) => {
+  const updateCurrentUser = useCallback((user: Profile | null) => {
     setUserProfile(user);
   }, []);
 
@@ -106,7 +108,6 @@ export function ProfileApiProvider({ children }: { children: React.ReactNode }) 
         sent_requests: sentRequests,
         received_requests: receivedRequests,
       };
-      console.log(updatedItems);
       return updatedItems;
     });
   }, [user?.uid]); // Dep on user.uid for safety

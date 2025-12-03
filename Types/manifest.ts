@@ -1,4 +1,5 @@
 interface Manifest {
+        owner_id:string,    
         name: string;
         version: string;
         description: string;

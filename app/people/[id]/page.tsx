@@ -9,8 +9,9 @@ import { OthersFriendsList } from "../components/friends_list";
 import { useFriendsManagement } from "@/hooks/user_friends_managements";
 import { useProfile } from "@/contexts/ProfileContext";
 import { Users } from "lucide-react";
+import ListDisplayPlaceHolder from "../components/friends_visibility";
 
-
+//ToDo: check and complete this
 export default function PeopleProfile() {
     const params = useParams();
     const { user } = useAuth()
@@ -114,13 +115,19 @@ export default function PeopleProfile() {
                             <div className="h-px bg-border" />
                         </div>
 
-                        {<OthersFriendsList 
+                    {userProfile?.friends_visibility
+                        ? <OthersFriendsList 
                             friends={usersFriends}
                             onAdd={sendFriendRequest}
                             onReject={handleRejectRequest}
                             onAccept={handleAcceptRequest}
                             onRemove={handleRemoveFriend} 
-                        />}
+                        />
+                        : <ListDisplayPlaceHolder title={
+                            <h1 className="flex flex-col">Sadly
+                            <span>{userProfile?.user_name}'s</span> Friends are not visible
+                            </h1>
+                    } Icon={Users} />}
                     </div>
             </div>
         )

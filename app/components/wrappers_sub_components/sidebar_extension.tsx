@@ -18,7 +18,6 @@ export default function SidebarMenuExtensionItemWrapper({
   onLinkPress?: () => void;
 }) {
   const { theme } = useTheme();
-  console.log("Rendering SidebarMenuExtensionItemWrapper for ", theme);
   return (
     <SidebarMenuItem
       onClick={(e) => {

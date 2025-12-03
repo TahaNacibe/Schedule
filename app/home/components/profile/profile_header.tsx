@@ -1,4 +1,5 @@
-import EditProfileDialog from "../dialogs/edit_profile_dialog";
+import EditProfileDialog from "../../dialogs/edit_profile_dialog";
+
 
 interface ProfileHeaderProps {
     isLocalProfile: boolean;

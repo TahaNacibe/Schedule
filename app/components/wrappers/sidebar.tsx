@@ -11,56 +11,52 @@ import { ShoppingBag } from "lucide-react";
 import SidebarMenuItemWrapper from "../wrappers_sub_components/sidebar_menu_item";
 import { ThemeTogglerButton } from "@/components/animate-ui/components/buttons/theme-toggler";
 import SidebarProfileComponent from "../wrappers_sub_components/sidebar_profile_component";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import SidebarMenuExtensionItemWrapper from "../wrappers_sub_components/sidebar_extension";
 import Link from "next/link";
 import { useExtensionsManager } from "@/contexts/ExtensionManagerContext";
 import LoadingSpinner from "@/components/costume/loading_spinner";
 import { useProfile } from "@/contexts/ProfileContext";
+import ExtensionsStore from "../extenstions_store";
 
 export default function SideBar() {
   const [activeExtensionId, setActiveExtensionId] = useState<string | null>(
     "/"
   );
-  const { readExtensions, loadExtensionsList, getExtensionsLoadingState } =
+  const { extensions, loadExtensionsList, loading } =
     useExtensionsManager();
-  const {userProfile} = useProfile()
+  const { userProfile } = useProfile()
+  const didInit = useRef(false);
 
   const fetchUserExtensions = async () => {
     await loadExtensionsList();
   };
 
   useEffect(() => {
-    fetchUserExtensions();
+      if (!didInit.current) {
+      didInit.current = true;
+      fetchUserExtensions();
+    }
   }, []);
 
-  const quickActionOptions = [
-    {title: "PROFILE_PLACE_HOLDER", icon: null},
-    { title: "STORE", icon: ShoppingBag },
-  ];
 
   // Sidebar UI
   return (
     <Sidebar
       collapsible="icon"
-      className="w-13! left-0 overflow-x-hidden pt-0 flex justify-between 
-      border-r! border-gray-300 dark:border-gray-700"
+      className="w-13! left-0 overflow-x-hidden pt-0 flex! justify-between 
+      border-r! border-gray-300 dark:border-gray-700 sm:flex!"
     >
-      <SidebarContent className="overflow-x-hidden pt-4  gap-0">
+      {userProfile && <SidebarContent className="overflow-x-hidden pt-4  gap-0">
         {/* --------- Main Components ---------- */}
-        {quickActionOptions.map((action, index) => {
-          if (index == 0) {
-            return (
-              <Link
-              key={index}
+        <Link
                 onClick={(e) => {
                   setActiveExtensionId("/")
                 }}
-                href={"/home"} className="relative">
+                href={"/"} className="relative">
                 <SidebarProfileComponent src={userProfile?.photo_URL} />
                 {activeExtensionId === "/" && (
                   <div
-                    key={index}
                       className="
                       absolute left-0 top-1/2 -translate-y-1/2
                       w-1 h-8 bg-gray-700 dark:bg-white rounded-r-full
@@ -68,32 +64,18 @@ export default function SideBar() {
                       "
                   />
               )}
-              </Link>
-            );
-          } else {
-            return (
-              <SidebarMenuItemWrapper
-                key={action.title}
-                onClick={() => {
-                  setActiveExtensionId(action.title);
-                }}
-                Icon={action.icon!}
-                activeId={activeExtensionId!}
-                href={action.title}
-              />
-            );
-          }
-        })}
+        </Link>
+        <ExtensionsStore isActive={activeExtensionId === "store"} />
         <SidebarSeparator className="border dark:border-gray-700 border-gray-200 mx-0! shadow-none" />
 
         {/* ------------ Extensions ---------- */}
-        {getExtensionsLoadingState() ? (
+        {loading ? (
           <div className="h-full w-full flex items-start pt-4 justify-center">
             <LoadingSpinner size="w-7 h-7" />
           </div>
         ) : (
           <div>
-            {readExtensions().map((ext, index) => (
+            {extensions.map((ext, index) => (
               <SidebarMenuExtensionItemWrapper
                 key={ext.id + index}
                 title={ext.manifest.name}
@@ -107,8 +89,8 @@ export default function SideBar() {
             ))}
           </div>
         )}
-      </SidebarContent>
-      <SidebarFooter className="p-0! m-0!">
+      </SidebarContent>}
+      <SidebarFooter className="p-0! m-0! bottom-0 absolute left-3">
         <SidebarMenu>
           <SidebarMenuItem>
             <ThemeTogglerButton
