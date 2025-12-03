@@ -142,7 +142,13 @@ export default function ExtensionPage() {
     }
 
     // Send response back to iframe
-    iframeRef.current?.contentWindow?.postMessage(response, '*');
+    iframeRef.current?.contentWindow?.postMessage({
+      ...response,
+      payload: {
+        ...response.payload,
+        requestId: payload.requestId
+      }
+    }, '*');
   };
 
   useEffect(() => {
